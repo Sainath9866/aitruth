@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 interface Question {
-    id: number;
+    id: string;
     text: string;
     subject: string;
 }
 
 interface Evaluation {
-    id: number;
+    id: string;
     model_name: string;
     accuracy_score: number;
     clarity_score: number;
@@ -21,7 +21,7 @@ interface Evaluation {
 
 export default function EvaluationsPage() {
     const [questions, setQuestions] = useState<Question[]>([]);
-    const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
+    const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
     const [selectedModel, setSelectedModel] = useState("gpt-4o");
     const [selectedProvider, setSelectedProvider] = useState("openai");
     const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function EvaluationsPage() {
     const loadQuestions = async () => {
         try {
             console.log("Fetching questions from API...");
-            const data = await api.get("/questions/");
+            const data = await api.get("/questions");
             console.log("Questions received:", data);
             setQuestions(data);
         } catch (error) {
@@ -59,8 +59,12 @@ export default function EvaluationsPage() {
         setResult(null);
         try {
             const res = await api.post(
-                `/evaluations/run/${selectedQuestionId}?model_provider=${selectedProvider}&model_name=${selectedModel}`,
-                {}
+                "/evaluations",
+                {
+                    question_id: selectedQuestionId,
+                    provider: selectedProvider,
+                    model_name: selectedModel
+                }
             );
             setResult(res);
         } catch (e) {
@@ -81,7 +85,7 @@ export default function EvaluationsPage() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Select Question</label>
                         <select
                             className="w-full border border-gray-300 p-2 rounded text-gray-900"
-                            onChange={(e) => setSelectedQuestionId(Number(e.target.value))}
+                            onChange={(e) => setSelectedQuestionId(e.target.value)}
                             value={selectedQuestionId || ""}
                         >
                             <option value="">-- Select a Question --</option>

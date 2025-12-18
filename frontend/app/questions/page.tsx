@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 interface Question {
-    id: number;
+    id: string;
     text: string;
     subject: string;
     reference_answer: string;
@@ -25,7 +25,7 @@ export default function QuestionsPage() {
     }, []);
 
     const loadQuestions = async () => {
-        const data = await api.get("/questions/");
+        const data = await api.get("/questions");
         setQuestions(data);
     };
 
@@ -35,7 +35,7 @@ export default function QuestionsPage() {
         loadQuestions();
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         await api.delete(`/questions/${id}`);
         loadQuestions();
     };
